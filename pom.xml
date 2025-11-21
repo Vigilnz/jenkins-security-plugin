@@ -14,8 +14,9 @@
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
-  <name>TODO Plugin</name>
-  <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+  <!--  Plugin Name  -->
+  <name>Vigilnz Security</name>
+  <url>https://dev.vigilnz.com/</url>
   <licenses>
     <license>
       <name>MIT License</name>
@@ -51,6 +52,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.jenkins-ci.main</groupId>
+        <artifactId>jenkins-core</artifactId>
+        <version>${jenkins.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
