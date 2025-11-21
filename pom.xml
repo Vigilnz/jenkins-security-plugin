@@ -10,7 +10,7 @@
   </parent>
 
   <groupId>io.jenkins.plugins</groupId>
-  <artifactId>.</artifactId>
+  <artifactId>vigilnz-security</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
@@ -57,6 +57,12 @@
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>jenkins-core</artifactId>
         <version>${jenkins.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>credentials</artifactId>
+        <version>1337.v60b_d7b_c7b_c9f</version>
       </dependency>
 
     </dependencies>

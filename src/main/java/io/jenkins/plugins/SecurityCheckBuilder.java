@@ -9,6 +9,8 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.ForwardToView;
+import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
 
 import java.io.IOException;
@@ -32,6 +34,11 @@ public class SecurityCheckBuilder extends Builder {
     public String getTargetFile() {
         return targetFile;
     }
+
+    public HttpResponse doAddToken() {
+        return new ForwardToView(this, "addToken.jelly");
+    }
+
 
     // this function trigger when user click the build button
     @Override
