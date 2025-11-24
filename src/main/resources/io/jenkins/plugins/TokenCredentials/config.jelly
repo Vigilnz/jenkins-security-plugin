@@ -1,0 +1,22 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:entry title="Token" field="token">
+        <f:password/>
+    </f:entry>
+    <f:entry title="ID" field="tokenId">
+        <j:choose>
+            <j:when test="${instance != null and instance.tokenId != null}">
+                <f:readOnlyTextbox/>
+            </j:when>
+            <j:otherwise>
+                <f:textbox/>
+            </j:otherwise>
+        </j:choose>
+    </f:entry>
+
+    <f:entry title="Description" field="tokenDescription">
+        <f:textbox/>
+    </f:entry>
+
+</j:jelly>

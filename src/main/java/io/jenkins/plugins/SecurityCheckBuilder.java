@@ -1,19 +1,23 @@
 package io.jenkins.plugins;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.Item;
+import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.ForwardToView;
-import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 // This file for Jenkins FreeStyle Job Method
 public class SecurityCheckBuilder extends Builder {
@@ -35,11 +39,6 @@ public class SecurityCheckBuilder extends Builder {
         return targetFile;
     }
 
-    public HttpResponse doAddToken() {
-        return new ForwardToView(this, "addToken.jelly");
-    }
-
-
     // this function trigger when user click the build button
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener)
@@ -55,8 +54,22 @@ public class SecurityCheckBuilder extends Builder {
 
         @Override
         public String getDisplayName() {
-            return "Invoke Vigilnz Security Task";   // 👈 This appears in dropdown
+            return "Invoke Vigilnz Security Task";   // This appears in dropdown
         }
+
+        public ListBoxModel doFillTokenItems(@AncestorInPath Item project) {
+            ListBoxModel items = new ListBoxModel();
+
+            for (TokenCredentials c : CredentialsProvider.lookupCredentials(
+                    TokenCredentials.class,
+                    project,
+                    ACL.SYSTEM,
+                    Collections.emptyList())) {
+                items.add(c.getTokenDescription(), c.getId());
+            }
+            return items;
+        }
+
 
         @Override
         public boolean isApplicable(Class jobType) {

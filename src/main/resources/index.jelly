@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    Vigilnz Security Plugin — provides custom build and pipeline steps.
+</div>
