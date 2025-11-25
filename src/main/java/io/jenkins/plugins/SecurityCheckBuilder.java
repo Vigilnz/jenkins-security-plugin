@@ -41,11 +41,20 @@ public class SecurityCheckBuilder extends Builder {
 
     // this function trigger when user click the build button
     @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener)
-            throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+
+        listener.getLogger().println("------ Freestyle Method ------");
+
         String tokenText = token.getPlainText(); // actual value
         listener.getLogger().println("Your Token from Plugin: " + tokenText);
         listener.getLogger().println("Your Target File : " + targetFile);
+        boolean result = ApiService.triggerScan(tokenText, targetFile, listener);
+
+        if (!result) {
+            listener.error("Scan failed");
+            return false;
+        }
+
         return true;
     }
 
@@ -60,12 +69,12 @@ public class SecurityCheckBuilder extends Builder {
         public ListBoxModel doFillTokenItems(@AncestorInPath Item project) {
             ListBoxModel items = new ListBoxModel();
 
-            for (TokenCredentials c : CredentialsProvider.lookupCredentials(
-                    TokenCredentials.class,
-                    project,
-                    ACL.SYSTEM,
-                    Collections.emptyList())) {
-                items.add(c.getTokenDescription(), c.getId());
+            for (TokenCredentials c : CredentialsProvider.lookupCredentials(TokenCredentials.class, project, ACL.SYSTEM, Collections.emptyList())) {
+                String label = c.getTokenDescription();
+                if (label == null || label.isEmpty()) {
+                    label = c.getId();
+                }
+                items.add(label, c.getId());
             }
             return items;
         }

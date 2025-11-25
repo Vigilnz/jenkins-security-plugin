@@ -16,12 +16,7 @@ public class PipelineStepExecution extends StepExecution {
 
     @Override
     public boolean start() throws Exception {
-//        getContext().get(TaskListener.class)
-//                .getLogger()
-//                .println("Option1: " + step.getToken() + ", Option2: " + step.getTargetFile());
-//        // Add your custom logic here
-//        getContext().onSuccess(null);
-//        return true;
+
         TaskListener listener = getContext().get(TaskListener.class);
         Run<?, ?> run = getContext().get(Run.class);
         TokenCredentials creds =
@@ -30,12 +25,19 @@ public class PipelineStepExecution extends StepExecution {
                         TokenCredentials.class,
                         run
                 );
-        listener.getLogger().println("Credentials : " + creds);
+        listener.getLogger().println("------ Pipeline Method ------");
 
         if (creds != null) {
             listener.getLogger().println("Token ID: " + creds.getTokenId());
             listener.getLogger().println("Description: " + creds.getTokenDescription());
-            listener.getLogger().println("Token Value: " + creds.getToken().getPlainText());
+
+            String token = creds.getToken().getPlainText();
+            boolean result = ApiService.triggerScan(token, step.getTargetFile(), listener);
+
+            if (!result) {
+                listener.error("Scan failed");
+                return false;
+            }
         } else {
             listener.getLogger().println("No Vigilnz Token credential found");
         }
