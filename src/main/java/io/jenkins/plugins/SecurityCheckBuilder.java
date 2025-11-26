@@ -1,6 +1,7 @@
 package io.jenkins.plugins;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -43,12 +44,13 @@ public class SecurityCheckBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
 
+        EnvVars env = build.getEnvironment(listener);
         listener.getLogger().println("------ Freestyle Method ------");
 
         String tokenText = token.getPlainText(); // actual value
         listener.getLogger().println("Your Token from Plugin: " + tokenText);
         listener.getLogger().println("Your Target File : " + targetFile);
-        boolean result = ApiService.triggerScan(tokenText, targetFile, listener);
+        boolean result = ApiService.triggerScan(tokenText, targetFile, env, listener);
 
         if (!result) {
             listener.error("Scan failed");

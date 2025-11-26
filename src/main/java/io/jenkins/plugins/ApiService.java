@@ -1,5 +1,6 @@
 package io.jenkins.plugins;
 
+import hudson.EnvVars;
 import hudson.model.TaskListener;
 import net.sf.json.JSONObject;
 
@@ -11,9 +12,18 @@ import java.net.URL;
 
 public class ApiService {
 
-    public static boolean triggerScan(String token, String targetFile, TaskListener listener) {
+    public static boolean triggerScan(String token, String targetFile, EnvVars env, TaskListener listener) {
         try {
             URL url = new URL("https://devmiddleware.vigilnz.com/scan-targets/create");
+
+            String branch = env.get("GIT_BRANCH");
+            String repoUrl = env.get("GIT_URL");
+            String commit = env.get("GIT_COMMIT");
+
+            listener.getLogger().println("Branch: " + branch);
+            listener.getLogger().println("Repo URL: " + repoUrl);
+            listener.getLogger().println("Commit: " + commit);
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("POST");
