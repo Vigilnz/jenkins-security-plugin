@@ -95,18 +95,18 @@ public class PipelineStepExecution extends StepExecution {
 
             String token = creds.getToken().getPlainText();
             List<String> scanTypes = step.getScanTypes();
-            
+
             // Validate at least one scan type is selected
             if (scanTypes == null || scanTypes.isEmpty()) {
                 listener.error("Error: At least one scan type must be selected.");
                 getContext().onFailure(new AbortException("At least one scan type must be selected"));
                 return false;
             }
-            
-            listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
-            boolean result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
 
-            if (!result) {
+            listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
+            String result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
+
+            if (result == null || result.isEmpty()) {
                 listener.error("Scan failed");
                 getContext().onFailure(new AbortException("Scan failed"));
                 return false;

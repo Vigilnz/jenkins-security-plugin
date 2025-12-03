@@ -4,7 +4,7 @@
     <f:entry title="Token" field="token">
         <f:password/>
     </f:entry>
-    
+
     <f:entry title="ID">
         <j:choose>
             <!-- Existing credential: show read-only with actual Jenkins ID -->

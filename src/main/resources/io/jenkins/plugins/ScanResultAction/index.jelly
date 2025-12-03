@@ -1,0 +1,80 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+    <l:layout title="Vigilnz Security Scan Results">
+        <l:main-panel>
+            <h1 style="display:flex; align-items:center; gap:10px;">
+                <svg style="width: 48px; height: 48px;" viewBox="0 0 24 24" fill="none" stroke="#0066cc"
+                     stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                Vigilnz Security Scan Results
+            </h1>
+
+            <!-- Scan Information -->
+            <div style="margin-top: 20px;">
+                <h2>Scan Information</h2>
+                <table class="pane bigtable" style="width: 100%;">
+                    <tr>
+                        <td class="pane-header">
+                            <strong>Git Repository:</strong>
+                        </td>
+                        <td class="pane">
+                            <a href="${it.response.gitHubUrl}" target="_blank">${it.response.gitHubUrl}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pane-header">
+                            <strong>Total Requested:</strong>
+                        </td>
+                        <td class="pane">${it.response.totalRequested}</td>
+                    </tr>
+                    <tr>
+                        <td class="pane-header">
+                            <strong>Successful:</strong>
+                        </td>
+                        <td class="pane" style="color:green; font-weight:bold;">${it.response.successfulResults}</td>
+                    </tr>
+                    <tr>
+                        <td class="pane-header">
+                            <strong>Failed:</strong>
+                        </td>
+                        <td class="pane" style="color:red; font-weight:bold;">${it.response.failedResults}</td>
+                    </tr>
+                    <tr>
+                        <td class="pane-header">
+                            <strong>Scan Types:</strong>
+                        </td>
+                        <td class="pane" style="text-transform: uppercase;">
+                            <j:forEach var="type" items="${it.response.scanTypes}">
+                                ${type}
+                                <j:if test="${!type.equals(it.response.scanTypes[it.response.scanTypes.size()-1])}">,
+                                </j:if>
+                            </j:forEach>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Individual Scan Results -->
+            <div style="margin-top: 30px;">
+                <h2>Scan Results</h2>
+                <table class="pane bigtable" style="width: 100%; text-align:center;">
+                    <tr>
+                        <th class="pane-header">Scan Type</th>
+                        <th class="pane-header">Status</th>
+                        <th class="pane-header">Message</th>
+                    </tr>
+                    <j:forEach var="res" items="${it.response.results}">
+                        <tr>
+                            <td class="pane" style="text-align: left;text-transform: uppercase;">
+                                <strong>${res.scanType}</strong>
+                            </td>
+                            <td class="pane" style="color:orange; font-weight:bold;text-align: left;">${res.status}</td>
+                            <td class="pane" style="text-align: left;">${res.message}</td>
+                        </tr>
+                    </j:forEach>
+                </table>
+            </div>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

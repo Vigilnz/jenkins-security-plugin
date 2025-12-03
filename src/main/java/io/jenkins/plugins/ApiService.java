@@ -11,11 +11,94 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import static io.jenkins.plugins.utils.VigilnzConfig.DEFAULT_AUTH_URL;
+import static io.jenkins.plugins.utils.VigilnzConfig.DEFAULT_SCAN_URL;
+
 public class ApiService {
 
-    public static boolean triggerScan(String token, String targetFile, List<String> scanTypes, EnvVars env, TaskListener listener) {
+    /** Authenticate with API key and get access token  */
+    public static AuthResponse authenticate(String apiKey, TaskListener listener) {
         try {
-            URL url = new URL("http://localhost:8000/scan-targets/multi-scan");
+            String authUrl = DEFAULT_AUTH_URL;
+            URL url = new URL(authUrl);
+
+            listener.getLogger().println("Authenticating with API key..." + url);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            JSONObject json = new JSONObject();
+            json.put("apiKey", apiKey);
+            String body = json.toString();
+
+            listener.getLogger().println("Auth Request Body: " + body);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(body.getBytes());
+            }
+
+            int responseCode = conn.getResponseCode();
+            listener.getLogger().println("Auth Response Code: " + responseCode);
+
+            if (responseCode != 200) {
+                // Read error response
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()))) {
+                    StringBuilder errorResponse = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        errorResponse.append(line);
+                    }
+                    listener.error("Authentication failed: " + errorResponse.toString());
+                }
+                return null;
+            }
+
+            // Read success response
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+
+            listener.getLogger().println("Auth Response Body: " + response);
+
+            // Parse response
+            JSONObject responseJson = JSONObject.fromObject(response.toString());
+            String accessToken = responseJson.getString("access_token");
+            String refreshToken = responseJson.optString("refresh_token", "");
+            long expiresIn = responseJson.optLong("expires_in", 3600);
+            String tokenType = responseJson.optString("token_type", "Bearer");
+
+            return new AuthResponse(accessToken, refreshToken, expiresIn, tokenType);
+
+        } catch (Exception e) {
+            listener.error("Authentication error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String triggerScan(String token, String targetFile, List<String> scanTypes, EnvVars env, TaskListener listener) {
+        try {
+            // Step 1: Authenticate and get access token
+            AuthResponse authResponse = authenticate(token, listener);
+            if (authResponse == null || authResponse.getAccessToken() == null) {
+                listener.error("Failed to authenticate. Cannot proceed with scan.");
+                return null;
+            }
+
+            String accessToken = authResponse.getAccessToken();
+            String tokenType = authResponse.getTokenType();
+
+            listener.getLogger().println("Using access token for multi-scan API call...");
+
+            // Step 2: Call multi-scan API with access token
+            String scanUrl = DEFAULT_SCAN_URL;
+            URL url = new URL(scanUrl);
 
             String branch = env.get("GIT_BRANCH");
             String repoUrl = env.get("GIT_URL");
@@ -24,24 +107,26 @@ public class ApiService {
             listener.getLogger().println("Branch: " + branch);
             listener.getLogger().println("Repo URL: " + repoUrl);
             listener.getLogger().println("Commit: " + commit);
+            listener.getLogger().println("Scan Url: " + scanUrl);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Cookie", token);
+            // Use Bearer token authentication
+            conn.setRequestProperty("Authorization", tokenType + " " + accessToken);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
             // Validate scan types
             if (scanTypes == null || scanTypes.isEmpty()) {
                 listener.error("No scan types selected. At least one scan type is required.");
-                return false;
+                return null;
             }
 
             JSONObject json = new JSONObject();
             // Send scan types as array
             json.put("scanTypes", scanTypes);
-            json.put("project", repoUrl);
+            json.put("project", targetFile);
             json.put("gitRepoUrl", repoUrl);
             if (targetFile != null) json.put("targetFile", targetFile);
 
@@ -54,12 +139,10 @@ public class ApiService {
             }
 
             int responseCode = conn.getResponseCode();
-            listener.getLogger().println("API Response Code: " + responseCode);
-
+            StringBuilder response = new StringBuilder();
             // Print the response to output
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream()))) {
 
-                StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
@@ -67,11 +150,42 @@ public class ApiService {
                 listener.getLogger().println("API Response Body: " + response);
             }
 
-            return responseCode == 200;
+            return response.toString();
 
         } catch (Exception e) {
             listener.getLogger().println("API Error: " + e.getMessage());
-            return false;
+            return null;
+        }
+    }
+
+    /** Authentication response model  */
+    public static class AuthResponse {
+        private String accessToken;
+        private String refreshToken;
+        private long expiresIn;
+        private String tokenType;
+
+        public AuthResponse(String accessToken, String refreshToken, long expiresIn, String tokenType) {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+            this.expiresIn = expiresIn;
+            this.tokenType = tokenType;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
+        public long getExpiresIn() {
+            return expiresIn;
+        }
+
+        public String getTokenType() {
+            return tokenType;
         }
     }
 

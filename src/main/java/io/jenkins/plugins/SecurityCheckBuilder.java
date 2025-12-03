@@ -98,12 +98,12 @@ public class SecurityCheckBuilder extends Builder {
 
         // Get the credential ID from the Secret
         String credentialId = token.getPlainText();
-        
+
         // Look up the actual TokenCredentials object
         TokenCredentials creds = CredentialsProvider.findCredentialById(
-            credentialId,
-            TokenCredentials.class,
-            build
+                credentialId,
+                TokenCredentials.class,
+                build
         );
 
         if (creds == null) {
@@ -113,15 +113,18 @@ public class SecurityCheckBuilder extends Builder {
 
         // Get the actual token value from the credential
         String tokenText = creds.getToken().getPlainText();
-        
+
         listener.getLogger().println("Credential ID: " + credentialId);
         listener.getLogger().println("Your Token from Plugin: " + tokenText);
         listener.getLogger().println("Your Target File : " + targetFile);
         listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
 
-        boolean result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
+        String result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
 
-        if (!result) {
+        // Attach results to build
+        build.addAction(new ScanResultAction(result));
+
+        if (result == null || result.isEmpty()) {
             listener.error("Scan failed");
             return false;
         }
