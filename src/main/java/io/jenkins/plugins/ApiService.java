@@ -2,6 +2,7 @@ package io.jenkins.plugins;
 
 import hudson.EnvVars;
 import hudson.model.TaskListener;
+import io.jenkins.plugins.models.AuthResponse;
 import net.sf.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -126,9 +127,12 @@ public class ApiService {
             JSONObject json = new JSONObject();
             // Send scan types as array
             json.put("scanTypes", scanTypes);
-            json.put("project", targetFile);
             json.put("gitRepoUrl", repoUrl);
-            if (targetFile != null) json.put("targetFile", targetFile);
+            // Optional fields
+            if (targetFile != null && !targetFile.trim().isEmpty()) {
+                json.put("project", targetFile);
+                json.put("targetFile", targetFile);
+            }
 
             String body = json.toString();
 
@@ -155,37 +159,6 @@ public class ApiService {
         } catch (Exception e) {
             listener.getLogger().println("API Error: " + e.getMessage());
             return null;
-        }
-    }
-
-    /** Authentication response model  */
-    public static class AuthResponse {
-        private String accessToken;
-        private String refreshToken;
-        private long expiresIn;
-        private String tokenType;
-
-        public AuthResponse(String accessToken, String refreshToken, long expiresIn, String tokenType) {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-            this.expiresIn = expiresIn;
-            this.tokenType = tokenType;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-
-        public long getExpiresIn() {
-            return expiresIn;
-        }
-
-        public String getTokenType() {
-            return tokenType;
         }
     }
 

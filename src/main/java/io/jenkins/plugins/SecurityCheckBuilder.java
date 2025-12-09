@@ -26,14 +26,18 @@ import java.util.List;
 public class SecurityCheckBuilder extends Builder {
 
     private final Secret token;
-    private final String targetFile;
+    private String targetFile;  // Optional parameter
     private boolean cveScan;
     private boolean sastScan;
     private boolean sbomScan;
 
     @DataBoundConstructor
-    public SecurityCheckBuilder(Secret token, String targetFile) {
+    public SecurityCheckBuilder(Secret token) {
         this.token = token;
+    }
+
+    @DataBoundSetter
+    public void setTargetFile(String targetFile) {
         this.targetFile = targetFile;
     }
 
@@ -116,7 +120,11 @@ public class SecurityCheckBuilder extends Builder {
 
         listener.getLogger().println("Credential ID: " + credentialId);
         listener.getLogger().println("Your Token from Plugin: " + tokenText);
-        listener.getLogger().println("Your Target File : " + targetFile);
+        if (targetFile != null && !targetFile.trim().isEmpty()) {
+            listener.getLogger().println("Target File: " + targetFile);
+        } else {
+            listener.getLogger().println("Target File: (not specified)");
+        }
         listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
 
         String result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);

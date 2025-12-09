@@ -1,36 +1,38 @@
 package io.jenkins.plugins.models;
 
 import java.util.List;
-import java.util.Map;
 
 public class ApiResponse {
-
+    private String message;
+    private String repositoryId;
     private String gitHubUrl;
-    private String totalRequested;
-    private String successfulResults;
-    private String failedResults;
     private List<String> scanTypes;
-    private List<Map<String, Object>> results;
+    private int totalRequested;
+    private int successfulResults;
+    private int failedResults;
+    private List<Result> results;
 
-    // No-args constructor (required for JSON mapping libraries like Jackson/Gson)
     public ApiResponse() {
     }
 
-    // Full-args constructor
-    public ApiResponse(String gitHubUrl,
-                       String totalRequested,
-                       String successfulResults,
-                       String failedResults,
-                       List<String> scanTypes,
-                       List<Map<String, Object>> results) {
-        this.gitHubUrl = gitHubUrl;
-        this.totalRequested = totalRequested;
-        this.successfulResults = successfulResults;
-        this.failedResults = failedResults;
-        this.scanTypes = scanTypes;
+    // getters and setters
+
+    public String getMessage() {
+        return message;
     }
 
-    // Getter and Setter for gitHubUrl
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(String repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
     public String getGitHubUrl() {
         return gitHubUrl;
     }
@@ -39,34 +41,6 @@ public class ApiResponse {
         this.gitHubUrl = gitHubUrl;
     }
 
-    // Getter and Setter for totalRequested
-    public String getTotalRequested() {
-        return totalRequested;
-    }
-
-    public void setTotalRequested(String totalRequested) {
-        this.totalRequested = totalRequested;
-    }
-
-    // Getter and Setter for successfulResults
-    public String getSuccessfulResults() {
-        return successfulResults;
-    }
-
-    public void setSuccessfulResults(String successfulResults) {
-        this.successfulResults = successfulResults;
-    }
-
-    // Getter and Setter for failedResults
-    public String getFailedResults() {
-        return failedResults;
-    }
-
-    public void setFailedResults(String failedResults) {
-        this.failedResults = failedResults;
-    }
-
-    // Getter and Setter for scanTypes
     public List<String> getScanTypes() {
         return scanTypes;
     }
@@ -75,12 +49,115 @@ public class ApiResponse {
         this.scanTypes = scanTypes;
     }
 
-    // Getter and Setter for results
-    public List<Map<String, Object>> getResults() {
+    public int getTotalRequested() {
+        return totalRequested;
+    }
+
+    public void setTotalRequested(int totalRequested) {
+        this.totalRequested = totalRequested;
+    }
+
+    public int getSuccessfulResults() {
+        return successfulResults;
+    }
+
+    public void setSuccessfulResults(int successfulResults) {
+        this.successfulResults = successfulResults;
+    }
+
+    public int getFailedResults() {
+        return failedResults;
+    }
+
+    public void setFailedResults(int failedResults) {
+        this.failedResults = failedResults;
+    }
+
+    public List<Result> getResults() {
         return results;
     }
 
-    public void setResults(List<Map<String, Object>> results) {
+    public void setResults(List<Result> results) {
         this.results = results;
     }
+
+    // Nested classes
+    public static class Result {
+        private String scanType;
+        private String projectName;
+        private String repositoryName;
+        private String totalPackages;
+        private String vulnerabilities;
+        private String language;
+        private String status;
+        private String message;
+
+        public Result() {
+        }
+
+        public String getScanType() {
+            return scanType;
+        }
+
+        public void setScanType(String scanType) {
+            this.scanType = scanType;
+        }
+
+        public String getVulnerabilities() {
+            return vulnerabilities;
+        }
+
+        public void setVulnerabilities(String vulnerabilities) {
+            this.vulnerabilities = vulnerabilities;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getLanguage() {
+            return language;
+        }
+
+        public void setLanguage(String status) {
+            this.language = language;
+        }
+
+        public String getProjectName() {
+            return projectName;
+        }
+
+        public void setProjectName(String projectName) {
+            this.projectName = projectName;
+        }
+
+        public String getRepositoryName() {
+            return repositoryName;
+        }
+
+        public void setRepositoryName(String repositoryName) {
+            this.repositoryName = repositoryName;
+        }
+
+        public String getTotalPackages() {
+            return totalPackages;
+        }
+
+        public void setTotalPackages(String totalPackages) {
+            this.totalPackages = totalPackages;
+        }
+    }
+
 }

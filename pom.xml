@@ -17,7 +17,8 @@
 
     <!--  Plugin Name  -->
     <name>Vigilnz Security</name>
-    <url>https://dev.vigilnz.com/</url>
+    <description>Vigilnz Security Plugin integrates security scanning capabilities into Jenkins. Run CVE, SAST, SBOM, and other security scans as part of your CI/CD pipeline.</description>
+    <url>https://github.com/${gitHubRepo}</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -31,6 +32,14 @@
         <tag>${scmTag}</tag>
         <url>https://github.com/${gitHubRepo}</url>
     </scm>
+    
+    <developers>
+        <developer>
+            <id>vigilnz</id>
+            <name>Vigilnz Team</name>
+            <email>support@vigilnz.com</email>
+        </developer>
+    </developers>
 
     <properties>
         <revision>1.0</revision>
@@ -43,7 +52,7 @@
         <spotless.check.skip>false</spotless.check.skip>
         <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
         <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
-        <hpi.bundledArtifacts>gson,json</hpi.bundledArtifacts>
+        <hpi.bundledArtifacts>jackson-annotations,jackson-core,jackson-databind</hpi.bundledArtifacts>
     </properties>
 
     <dependencyManagement>
@@ -104,15 +113,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20231013</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.20.1</version>
         </dependency>
 
     </dependencies>

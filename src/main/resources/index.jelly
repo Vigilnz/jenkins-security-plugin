@@ -1,4 +1,19 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Vigilnz Security Plugin — provides custom build and pipeline steps.
+    <p>
+        Vigilnz Security Plugin integrates security scanning capabilities into Jenkins CI/CD pipelines.
+    </p>
+    <p>
+        Features:
+    </p>
+    <ul>
+        <li>Run CVE, SAST, SBOM, and other security scans</li>
+        <li>Support for both Freestyle and Pipeline jobs</li>
+        <li>Secure credential management</li>
+        <li>Detailed scan results in build sidebar</li>
+        <li>Multi-scan type support with flexible configuration</li>
+    </ul>
+    <p>
+        For more information, visit <a href="https://github.com/${project.url}">GitHub</a>.
+    </p>
 </div>

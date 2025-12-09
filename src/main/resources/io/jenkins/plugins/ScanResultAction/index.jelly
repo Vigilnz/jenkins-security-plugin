@@ -2,11 +2,14 @@
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
     <l:layout title="Vigilnz Security Scan Results">
         <l:main-panel>
-            <h1 style="display:flex; align-items:center; gap:10px;">
-                <svg style="width: 48px; height: 48px;" viewBox="0 0 24 24" fill="none" stroke="#0066cc"
-                     stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
+            <h1 style="display:flex; align-items:center; gap:10px;font-family: 'Helvetica', sans-serif;">
+                <!--                <svg style="width: 48px; height: 48px;" viewBox="0 0 24 24" fill="none" stroke="#0066cc"-->
+                <!--                     stroke-width="2">-->
+                <!--                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>-->
+                <!--                </svg>-->
+                <img src="https://vigilnz-default.s3.us-west-2.amazonaws.com/assets/title_logo.png"
+                     alt="Security Icon"
+                     style="width:45px; height:45px;"/>
                 Vigilnz Security Scan Results
             </h1>
 
@@ -15,7 +18,7 @@
                 <h2>Scan Information</h2>
                 <table class="pane bigtable" style="width: 100%;">
                     <tr>
-                        <td class="pane-header">
+                        <td class="pane-header" style="width:300px">
                             <strong>Git Repository:</strong>
                         </td>
                         <td class="pane">
@@ -23,25 +26,25 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="pane-header">
+                        <td class="pane-header" style="width:300px">
                             <strong>Total Requested:</strong>
                         </td>
                         <td class="pane">${it.response.totalRequested}</td>
                     </tr>
                     <tr>
-                        <td class="pane-header">
+                        <td class="pane-header" style="width:300px">
                             <strong>Successful:</strong>
                         </td>
                         <td class="pane" style="color:green; font-weight:bold;">${it.response.successfulResults}</td>
                     </tr>
                     <tr>
-                        <td class="pane-header">
+                        <td class="pane-header" style="width:300px">
                             <strong>Failed:</strong>
                         </td>
                         <td class="pane" style="color:red; font-weight:bold;">${it.response.failedResults}</td>
                     </tr>
                     <tr>
-                        <td class="pane-header">
+                        <td class="pane-header" style="width:300px">
                             <strong>Scan Types:</strong>
                         </td>
                         <td class="pane" style="text-transform: uppercase;">
@@ -56,6 +59,32 @@
             </div>
 
             <!-- Individual Scan Results -->
+            <!--            <div style="margin-top: 30px;">-->
+            <!--                <j:forEach var="res" items="${it.response.results}">-->
+            <!--                    <h2>${res.scanType} Scan Results</h2>-->
+            <!--                    <table class="pane bigtable" style="width: 100%;margin-bottom:20px; text-align:center;">-->
+            <!--                        <tr>-->
+            <!--                            <th class="pane-header">Project Name</th>-->
+            <!--                            <th class="pane-header">Repository Name</th>-->
+            <!--                            <th class="pane-header">Language</th>-->
+            <!--                            <th class="pane-header">Total Packages</th>-->
+            <!--                            <th class="pane-header">Vulnerabilities</th>-->
+            <!--                        </tr>-->
+            <!--                        <tr>-->
+            <!--                            <td class="pane" style="text-align: left;text-transform: uppercase;">-->
+            <!--                                <strong>${res.projectName}</strong>-->
+            <!--                            </td>-->
+            <!--                            <td class="pane" style="color:orange; font-weight:bold;text-align: left;">-->
+            <!--                                ${res.repositoryName}-->
+            <!--                            </td>-->
+            <!--                            <td class="pane" style="text-align: left;">${res.language}</td>-->
+            <!--                            <td class="pane" style="text-align: left;">${res.totalPackages}</td>-->
+            <!--                            <td class="pane" style="text-align: left;">${res.vulnerabilities}</td>-->
+            <!--                        </tr>-->
+            <!--                    </table>-->
+            <!--                </j:forEach>-->
+            <!--            </div>-->
+
             <div style="margin-top: 30px;">
                 <h2>Scan Results</h2>
                 <table class="pane bigtable" style="width: 100%; text-align:center;">
@@ -69,7 +98,9 @@
                             <td class="pane" style="text-align: left;text-transform: uppercase;">
                                 <strong>${res.scanType}</strong>
                             </td>
-                            <td class="pane" style="color:orange; font-weight:bold;text-align: left;">${res.status}</td>
+                            <td class="pane" style="color:orange; font-weight:bold;text-align: left;">
+                                ${res.status}
+                            </td>
                             <td class="pane" style="text-align: left;">${res.message}</td>
                         </tr>
                     </j:forEach>

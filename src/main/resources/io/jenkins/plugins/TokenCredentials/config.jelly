@@ -10,7 +10,8 @@
             <!-- Existing credential: show read-only with actual Jenkins ID -->
             <j:when test="${instance != null}">
                 <!-- Get the actual ID to display and submit -->
-                <j:set var="idValue" value="${instance.tokenId != null and instance.tokenId != '' ? instance.tokenId : instance.id}"/>
+                <j:set var="idValue"
+                       value="${instance.tokenId != null and instance.tokenId != '' ? instance.tokenId : instance.id}"/>
                 <!-- Display as read-only -->
                 <f:readOnlyTextbox value="${idValue}"/>
                 <!-- Submit the actual ID as hidden field (not using field="tokenId" to avoid conflict) -->
@@ -26,5 +27,4 @@
     <f:entry title="Description" field="tokenDescription">
         <f:textbox/>
     </f:entry>
-
 </j:jelly>
