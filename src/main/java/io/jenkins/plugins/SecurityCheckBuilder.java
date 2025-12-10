@@ -26,15 +26,14 @@ import java.util.List;
 public class SecurityCheckBuilder extends Builder {
 
     private final Secret token;
-    private final String targetFile;
+    private String targetFile;  // Optional parameter
     private boolean cveScan;
     private boolean sastScan;
     private boolean sbomScan;
 
     @DataBoundConstructor
-    public SecurityCheckBuilder(Secret token, String targetFile) {
+    public SecurityCheckBuilder(Secret token) {
         this.token = token;
-        this.targetFile = targetFile;
     }
 
     public Secret getToken() {
@@ -43,6 +42,11 @@ public class SecurityCheckBuilder extends Builder {
 
     public String getTargetFile() {
         return targetFile;
+    }
+
+    @DataBoundSetter
+    public void setTargetFile(String targetFile) {
+        this.targetFile = targetFile;
     }
 
     public boolean isCveScan() {
@@ -98,30 +102,37 @@ public class SecurityCheckBuilder extends Builder {
 
         // Get the credential ID from the Secret
         String credentialId = token.getPlainText();
-        
+
         // Look up the actual TokenCredentials object
         TokenCredentials creds = CredentialsProvider.findCredentialById(
-            credentialId,
-            TokenCredentials.class,
-            build
+                credentialId,
+                TokenCredentials.class,
+                build
         );
 
         if (creds == null) {
-            listener.error("Error: Vigilnz Token credential not found with ID: " + credentialId);
+            listener.error("Error: Vigilnz Token credential not found");
             return false;
         }
 
         // Get the actual token value from the credential
         String tokenText = creds.getToken().getPlainText();
-        
-        listener.getLogger().println("Credential ID: " + credentialId);
-        listener.getLogger().println("Your Token from Plugin: " + tokenText);
-        listener.getLogger().println("Your Target File : " + targetFile);
+
+//        listener.getLogger().println("Credential ID: " + credentialId);
+//        listener.getLogger().println("Your Token from Plugin: " + tokenText);
+        if (targetFile != null && !targetFile.trim().isEmpty()) {
+            listener.getLogger().println("Target File: " + targetFile);
+        } else {
+            listener.getLogger().println("Target File: (not specified)");
+        }
         listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
 
-        boolean result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
+        String result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
 
-        if (!result) {
+        // Attach results to build
+        build.addAction(new ScanResultAction(result));
+
+        if (result == null || result.isEmpty()) {
             listener.error("Scan failed");
             return false;
         }

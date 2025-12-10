@@ -27,6 +27,13 @@ public class TokenCredentials extends BaseStandardCredentials {
         // If tokenId is null or empty, use empty string (Jenkins will handle ID generation)
         // This prevents errors when updating credentials that were created without an ID
         String idToUse = (tokenId == null || tokenId.trim().isEmpty()) ? "" : tokenId;
+
+        if (token == null || Secret.toString(token).isEmpty()) {
+            throw new IllegalArgumentException("Token is required");
+        }
+        if (tokenId != null && tokenId.contains(" ")) {
+            throw new IllegalArgumentException("Token ID must not contain spaces");
+        }
         this.token = token;
         this.tokenId = idToUse;
         this.tokenDescription = tokenDescription;
@@ -48,6 +55,7 @@ public class TokenCredentials extends BaseStandardCredentials {
         return tokenDescription;
     }
 
+
     // Descriptor for Jenkins UI
     @Symbol("vigilnzToken")
     @Extension
@@ -58,8 +66,8 @@ public class TokenCredentials extends BaseStandardCredentials {
             return "Vigilnz Security Token";
         }
 
-        public FormValidation doCheckToken(@QueryParameter Secret token) {
-            if (token == null || Secret.toString(token).isEmpty()) {
+        public FormValidation doCheckToken(@QueryParameter String token) {
+            if (token == null || token.trim().isEmpty()) {
                 return FormValidation.error("Field is required");
             }
             return FormValidation.ok();

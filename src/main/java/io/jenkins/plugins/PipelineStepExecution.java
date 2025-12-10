@@ -83,8 +83,8 @@ public class PipelineStepExecution extends StepExecution {
         listener.getLogger().println("------ Pipeline Method ------");
 
         if (creds != null) {
-            listener.getLogger().println("Token ID: " + creds.getTokenId());
-            listener.getLogger().println("Description: " + creds.getTokenDescription());
+//            listener.getLogger().println("Token ID: " + creds.getTokenId());
+//            listener.getLogger().println("Description: " + creds.getTokenDescription());
             EnvVars env = getContext().get(EnvVars.class);
 
             FilePath ws = getContext().get(FilePath.class);
@@ -95,22 +95,25 @@ public class PipelineStepExecution extends StepExecution {
 
             String token = creds.getToken().getPlainText();
             List<String> scanTypes = step.getScanTypes();
-            
+
             // Validate at least one scan type is selected
             if (scanTypes == null || scanTypes.isEmpty()) {
                 listener.error("Error: At least one scan type must be selected.");
                 getContext().onFailure(new AbortException("At least one scan type must be selected"));
                 return false;
             }
-            
-            listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
-            boolean result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
 
-            if (!result) {
+            listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
+            String result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
+
+            run.addAction(new ScanResultAction(result));
+
+            if (result == null || result.isEmpty()) {
                 listener.error("Scan failed");
                 getContext().onFailure(new AbortException("Scan failed"));
                 return false;
             }
+
         } else {
             listener.getLogger().println("No Vigilnz Token credential found");
             getContext().onFailure(new AbortException("No Vigilnz Token credential found"));
