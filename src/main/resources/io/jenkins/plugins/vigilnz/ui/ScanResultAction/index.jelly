@@ -3,20 +3,14 @@
     <l:layout title="Vigilnz Security Scan Results">
         <l:main-panel>
             <h1 style="display:flex; align-items:center; gap:10px;font-family: 'Helvetica', sans-serif;">
-                <!--                <svg style="width: 48px; height: 48px;" viewBox="0 0 24 24" fill="none" stroke="#0066cc"-->
-                <!--                     stroke-width="2">-->
-                <!--                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>-->
-                <!--                </svg>-->
-                <img src="https://vigilnz-default.s3.us-west-2.amazonaws.com/assets/title_logo.png"
-                     alt="Security Icon"
-                     style="width:45px; height:45px;"/>
+                <l:icon src="symbol-vigilnz plugin-vigilnz-security" class="icon-xlg"/>
                 Vigilnz Security Scan Results
             </h1>
 
             <!-- Scan Information -->
             <div style="margin-top: 20px;">
                 <h2>Scan Information</h2>
-                <table class="pane bigtable" style="width: 100%;">
+                <table class="jenkins-table jenkins-table--medium" style="width: 100%;">
                     <tr>
                         <td class="pane-header" style="width:300px">
                             <strong>Git Repository:</strong>
@@ -87,23 +81,27 @@
 
             <div style="margin-top: 30px;">
                 <h2>Scan Results</h2>
-                <table class="pane bigtable" style="width: 100%; text-align:center;">
-                    <tr>
-                        <th class="pane-header">Scan Type</th>
-                        <th class="pane-header">Status</th>
-                        <th class="pane-header">Message</th>
-                    </tr>
-                    <j:forEach var="res" items="${it.response.results}">
+                <table class="jenkins-table sortable jenkins-table--medium" style="width: 100%; text-align:center;">
+                    <thead>
                         <tr>
-                            <td class="pane" style="text-align: left;text-transform: uppercase;">
-                                <strong>${res.scanType}</strong>
-                            </td>
-                            <td class="pane" style="color:orange; font-weight:bold;text-align: left;">
-                                ${res.status}
-                            </td>
-                            <td class="pane" style="text-align: left;">${res.message}</td>
+                            <th class="pane-header">Scan Type</th>
+                            <th class="pane-header">Status</th>
+                            <th class="pane-header">Message</th>
                         </tr>
-                    </j:forEach>
+                    </thead>
+                    <tbody>
+                        <j:forEach var="res" items="${it.response.results}">
+                            <tr>
+                                <td class="pane" style="text-align: left;text-transform: uppercase;">
+                                    <strong>${res.scanType}</strong>
+                                </td>
+                                <td class="pane" style="color:orange; font-weight:bold;text-align: left;">
+                                    ${res.status}
+                                </td>
+                                <td class="pane" style="text-align: left;">${res.message}</td>
+                            </tr>
+                        </j:forEach>
+                    </tbody>
                 </table>
             </div>
         </l:main-panel>

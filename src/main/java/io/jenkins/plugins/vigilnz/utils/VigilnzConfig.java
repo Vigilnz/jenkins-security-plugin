@@ -1,4 +1,4 @@
-package io.jenkins.plugins.utils;
+package io.jenkins.plugins.vigilnz.utils;
 
 
 public class VigilnzConfig {

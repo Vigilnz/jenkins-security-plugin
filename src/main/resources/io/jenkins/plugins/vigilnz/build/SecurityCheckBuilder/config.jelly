@@ -12,9 +12,6 @@
             <f:checkbox field="sbomScan" title="SBOM Scan"/>
         </div>
     </f:entry>
-    <!--    <f:entry title="Project" field="projectName">-->
-    <!--        <f:textbox/>-->
-    <!--    </f:entry>-->
     <f:entry title="Target File" field="targetFile">
         <f:textbox/>
     </f:entry>

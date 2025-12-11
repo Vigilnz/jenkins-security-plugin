@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.credentials;
 
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;

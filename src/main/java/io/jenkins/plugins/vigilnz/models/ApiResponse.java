@@ -1,4 +1,4 @@
-package io.jenkins.plugins.models;
+package io.jenkins.plugins.vigilnz.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

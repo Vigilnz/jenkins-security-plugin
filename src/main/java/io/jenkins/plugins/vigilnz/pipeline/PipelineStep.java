@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.pipeline;
 
 import hudson.Extension;
 import hudson.model.TaskListener;

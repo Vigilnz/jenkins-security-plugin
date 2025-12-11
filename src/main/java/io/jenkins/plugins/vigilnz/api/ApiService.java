@@ -1,8 +1,8 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.api;
 
 import hudson.EnvVars;
 import hudson.model.TaskListener;
-import io.jenkins.plugins.models.AuthResponse;
+import io.jenkins.plugins.vigilnz.models.AuthResponse;
 import net.sf.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -12,8 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import static io.jenkins.plugins.utils.VigilnzConfig.DEFAULT_AUTH_URL;
-import static io.jenkins.plugins.utils.VigilnzConfig.DEFAULT_SCAN_URL;
+import static io.jenkins.plugins.vigilnz.utils.VigilnzConfig.DEFAULT_AUTH_URL;
+import static io.jenkins.plugins.vigilnz.utils.VigilnzConfig.DEFAULT_SCAN_URL;
 
 public class ApiService {
 
@@ -71,7 +71,6 @@ public class ApiService {
 
         } catch (Exception e) {
             listener.error("Authentication error: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }

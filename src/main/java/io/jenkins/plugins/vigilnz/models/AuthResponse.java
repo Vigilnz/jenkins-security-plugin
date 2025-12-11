@@ -1,4 +1,4 @@
-package io.jenkins.plugins.models;
+package io.jenkins.plugins.vigilnz.models;
 
 public class AuthResponse {
 

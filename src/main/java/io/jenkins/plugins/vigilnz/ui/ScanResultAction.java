@@ -1,9 +1,9 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.Action;
-import io.jenkins.plugins.models.ApiResponse;
+import io.jenkins.plugins.vigilnz.models.ApiResponse;
 
 public class ScanResultAction implements Action {
     private final ApiResponse response;

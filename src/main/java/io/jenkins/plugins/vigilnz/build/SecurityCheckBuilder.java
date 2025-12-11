@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.build;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
@@ -13,10 +13,15 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import io.jenkins.cli.shaded.org.apache.commons.lang.StringUtils;
+import io.jenkins.plugins.vigilnz.api.ApiService;
+import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
+import io.jenkins.plugins.vigilnz.ui.ScanResultAction;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -25,18 +30,18 @@ import java.util.List;
 // This file for Jenkins FreeStyle Job Method
 public class SecurityCheckBuilder extends Builder {
 
-    private final Secret token;
+    private final String token;
     private String targetFile;  // Optional parameter
     private boolean cveScan;
     private boolean sastScan;
     private boolean sbomScan;
 
     @DataBoundConstructor
-    public SecurityCheckBuilder(Secret token) {
+    public SecurityCheckBuilder(String token) {
         this.token = token;
     }
 
-    public Secret getToken() {
+    public String getToken() {
         return token;
     }
 
@@ -100,12 +105,9 @@ public class SecurityCheckBuilder extends Builder {
             return false;
         }
 
-        // Get the credential ID from the Secret
-        String credentialId = token.getPlainText();
-
         // Look up the actual TokenCredentials object
         TokenCredentials creds = CredentialsProvider.findCredentialById(
-                credentialId,
+                token,
                 TokenCredentials.class,
                 build
         );
@@ -118,7 +120,7 @@ public class SecurityCheckBuilder extends Builder {
         // Get the actual token value from the credential
         String tokenText = creds.getToken().getPlainText();
 
-//        listener.getLogger().println("Credential ID: " + credentialId);
+//        listener.getLogger().println("Credential ID: " + credentialsId);
 //        listener.getLogger().println("Your Token from Plugin: " + tokenText);
         if (targetFile != null && !targetFile.trim().isEmpty()) {
             listener.getLogger().println("Target File: " + targetFile);
@@ -126,13 +128,13 @@ public class SecurityCheckBuilder extends Builder {
             listener.getLogger().println("Target File: (not specified)");
         }
         listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
+        String result = "";
 
-        String result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
-
-        // Attach results to build
-        build.addAction(new ScanResultAction(result));
-
-        if (result == null || result.isEmpty()) {
+        try {
+            result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
+            // Attach results to build
+            build.addAction(new ScanResultAction(result));
+        } catch (Exception e) {
             listener.error("Scan failed");
             return false;
         }
@@ -148,6 +150,7 @@ public class SecurityCheckBuilder extends Builder {
             return "Invoke Vigilnz Security Task";   // This appears in dropdown
         }
 
+        @POST
         public ListBoxModel doFillTokenItems(@AncestorInPath Item project) {
             ListBoxModel items = new ListBoxModel();
 
@@ -174,14 +177,13 @@ public class SecurityCheckBuilder extends Builder {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckScanTypes(@QueryParameter boolean cveScan,
-                                               @QueryParameter boolean sastScan,
-                                               @QueryParameter boolean sbomScan) {
-            if (!cveScan && !sastScan && !sbomScan) {
+        public FormValidation doCheckScanType(@QueryParameter String value) {
+            if (StringUtils.isBlank(value)) {
                 return FormValidation.error("You must select at least one scan type.");
             }
             return FormValidation.ok();
         }
+
     }
 
 }

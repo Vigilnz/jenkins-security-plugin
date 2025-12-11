@@ -1,4 +1,4 @@
-package io.jenkins.plugins;
+package io.jenkins.plugins.vigilnz.pipeline;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.AbortException;
@@ -6,6 +6,9 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import io.jenkins.plugins.vigilnz.api.ApiService;
+import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
+import io.jenkins.plugins.vigilnz.ui.ScanResultAction;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
@@ -104,11 +107,12 @@ public class PipelineStepExecution extends StepExecution {
             }
 
             listener.getLogger().println("Selected Scan Types: " + String.join(", ", scanTypes));
-            String result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
 
-            run.addAction(new ScanResultAction(result));
-
-            if (result == null || result.isEmpty()) {
+            String result;
+            try {
+                result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
+                run.addAction(new ScanResultAction(result));
+            } catch (Exception e) {
                 listener.error("Scan failed");
                 getContext().onFailure(new AbortException("Scan failed"));
                 return false;
