@@ -17,22 +17,10 @@ import org.kohsuke.stapler.verb.POST;
 @SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class TokenCredentials extends BaseStandardCredentials {
 
-    /** 
-     * API token - stored securely using Jenkins Secret (encrypted when serialized).
-     * This field uses Secret type which automatically encrypts the value on disk.
-     */
     private final Secret token;
-    
-    /** 
-     * Credential identifier (not sensitive - just a label/ID, not a password).
-     * This is a user-friendly identifier, not sensitive data.
-     */
+
     private final String tokenId;
-    
-    /** 
-     * Credential description (not sensitive - just metadata, not a password).
-     * This is descriptive text, not sensitive data.
-     */
+
     private final String tokenDescription;
 
     @DataBoundConstructor
@@ -97,7 +85,7 @@ public class TokenCredentials extends BaseStandardCredentials {
                 // Global credential creation/editing requires admin permission
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             }
-            
+
             if (token == null || token.trim().isEmpty()) {
                 return FormValidation.error("Field is required");
             }
@@ -116,7 +104,7 @@ public class TokenCredentials extends BaseStandardCredentials {
                 // Global credential creation/editing requires admin permission
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             }
-            
+
             if (tokenId != null && !tokenId.trim().isEmpty()) {
                 // Check for spaces
                 if (tokenId.contains(" ")) {

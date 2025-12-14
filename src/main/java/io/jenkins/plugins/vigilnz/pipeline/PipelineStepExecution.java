@@ -76,9 +76,19 @@ public class PipelineStepExecution extends StepExecution {
 
         TaskListener listener = getContext().get(TaskListener.class);
         Run<?, ?> run = getContext().get(Run.class);
+        
+        String credentialsId = step.getCredentialsId();
+        
+        // Validate credentials ID is provided
+        if (credentialsId == null || credentialsId.trim().isEmpty()) {
+            listener.error("Error: Credentials ID is required. Please provide a credential ID in the pipeline step.");
+            getContext().onFailure(new AbortException("Credentials ID is required"));
+            return false;
+        }
+        
         TokenCredentials creds =
                 CredentialsProvider.findCredentialById(
-                        step.getToken(),
+                        credentialsId,
                         TokenCredentials.class,
                         run
                 );
@@ -119,8 +129,8 @@ public class PipelineStepExecution extends StepExecution {
             }
 
         } else {
-            listener.getLogger().println("No Vigilnz Token credential found");
-            getContext().onFailure(new AbortException("No Vigilnz Token credential found"));
+            listener.error("Error: Vigilnz Token credential not found with ID: " + credentialsId);
+            getContext().onFailure(new AbortException("No Vigilnz Token credential found with ID: " + credentialsId));
             return false;
         }
 

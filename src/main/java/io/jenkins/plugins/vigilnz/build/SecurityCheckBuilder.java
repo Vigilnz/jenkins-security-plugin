@@ -29,26 +29,22 @@ import java.util.Collections;
 import java.util.List;
 
 // This file for Jenkins FreeStyle Job Method
-@SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class SecurityCheckBuilder extends Builder {
 
-    /** 
-     * Credential ID (not sensitive - just an identifier to look up the actual credential).
-     * The actual token is stored securely in TokenCredentials using Secret.
-     */
-    private final String token;
+    /** Credential ID (identifier to look up the actual credential, not sensitive) */
+    private final String credentialsId;
     private String targetFile;  // Optional parameter
     private boolean cveScan;
     private boolean sastScan;
     private boolean sbomScan;
 
     @DataBoundConstructor
-    public SecurityCheckBuilder(String token) {
-        this.token = token;
+    public SecurityCheckBuilder(String credentialsId) {
+        this.credentialsId = credentialsId;
     }
 
-    public String getToken() {
-        return token;
+    public String getCredentialsId() {
+        return credentialsId;
     }
 
     public String getTargetFile() {
@@ -111,18 +107,23 @@ public class SecurityCheckBuilder extends Builder {
             return false;
         }
 
+        // Validate credentials ID is provided
+        if (credentialsId == null || credentialsId.trim().isEmpty()) {
+            listener.error("Error: Credentials ID is required. Please select a credential in the build step configuration.");
+            return false;
+        }
+
         // Look up the actual TokenCredentials object
         TokenCredentials creds = CredentialsProvider.findCredentialById(
-                token,
+                credentialsId,
                 TokenCredentials.class,
                 build
         );
 
         if (creds == null) {
-            listener.error("Error: Vigilnz Token credential not found");
+            listener.error("Error: Vigilnz Token credential not found with ID: " + credentialsId);
             return false;
         }
-
         // Get the actual token value from the credential
         String tokenText = creds.getToken().getPlainText();
 
@@ -157,7 +158,7 @@ public class SecurityCheckBuilder extends Builder {
         }
 
         @POST
-        public ListBoxModel doFillTokenItems(@AncestorInPath Item project) {
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item project) {
             // Security: Check if user has permission to configure this project
             if (project == null || !project.hasPermission(Item.CONFIGURE)) {
                 return new ListBoxModel(); // Return empty list if no permission
@@ -187,7 +188,7 @@ public class SecurityCheckBuilder extends Builder {
         }
 
         @POST
-        public FormValidation doCheckToken(@AncestorInPath Item project, @QueryParameter Secret token) {
+        public FormValidation doCheckCredentialsId(@AncestorInPath Item project, @QueryParameter String credentialsId) {
             // Security: Check if user has permission to configure this project
             if (project != null && !project.hasPermission(Item.CONFIGURE)) {
                 return FormValidation.error("No permission to configure this project");
@@ -197,8 +198,8 @@ public class SecurityCheckBuilder extends Builder {
                 Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             }
 
-            if (token == null || Secret.toString(token).isEmpty()) {
-                return FormValidation.error("Token is required");
+            if (credentialsId == null || credentialsId.trim().isEmpty()) {
+                return FormValidation.error("Credentials selection is required");
             }
             return FormValidation.ok();
         }

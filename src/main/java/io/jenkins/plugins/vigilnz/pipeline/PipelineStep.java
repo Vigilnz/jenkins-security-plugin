@@ -15,23 +15,22 @@ import java.util.Set;
 
 /**
  * Pipeline step for Vigilnz security scans.
- * Security: The 'token' field stores only a credential ID (identifier), not the actual token value.
+ * Security: The 'credentialsId' field stores only a credential ID (identifier), not the actual token value.
  * The actual token is stored securely in TokenCredentials using Secret.
  */
-@SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class PipelineStep extends Step {
 
     /** 
      * Credential ID (not sensitive - just an identifier to look up the actual credential).
      * The actual token is stored securely in TokenCredentials using Secret.
      */
-    private final String token;
+    private final String credentialsId;
     private final List<String> scanTypes;
     private String targetFile;  // Optional parameter
 
     @DataBoundConstructor
-    public PipelineStep(String token, List<String> scanTypes) {
-        this.token = token;
+    public PipelineStep(String credentialsId, List<String> scanTypes) {
+        this.credentialsId = credentialsId;
         this.scanTypes = scanTypes != null ? scanTypes : List.of();
     }
 
@@ -40,8 +39,8 @@ public class PipelineStep extends Step {
         this.targetFile = targetFile;
     }
 
-    public String getToken() {
-        return token;
+    public String getCredentialsId() {
+        return credentialsId;
     }
 
     public String getTargetFile() {
