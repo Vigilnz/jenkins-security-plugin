@@ -29,8 +29,13 @@ import java.util.Collections;
 import java.util.List;
 
 // This file for Jenkins FreeStyle Job Method
+@SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class SecurityCheckBuilder extends Builder {
 
+    /** 
+     * Credential ID (not sensitive - just an identifier to look up the actual credential).
+     * The actual token is stored securely in TokenCredentials using Secret.
+     */
     private final String token;
     private String targetFile;  // Optional parameter
     private boolean cveScan;

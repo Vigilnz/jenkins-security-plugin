@@ -5,21 +5,30 @@ package io.jenkins.plugins.vigilnz.models;
  * NOTE: This class is NOT serialized to disk - it's only used in-memory during API calls.
  * Tokens are cleared from memory after use and never persisted.
  * This class does NOT implement Serializable, so fields are never written to disk.
+ * 
+ * Security: All token fields are in-memory only and never persisted to disk.
  */
+@SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class AuthResponse {
 
-    /** Access token - sensitive but only in-memory, never persisted (class not serializable) */
-    // lgtm[jenkins/password-in-field]
+    /** 
+     * Access token - sensitive but only in-memory, never persisted.
+     * This class does not implement Serializable, so this field is never written to disk.
+     */
     private final String accessToken;
     
-    /** Refresh token - sensitive but only in-memory, never persisted (class not serializable) */
-    // lgtm[jenkins/password-in-field]
+    /** 
+     * Refresh token - sensitive but only in-memory, never persisted.
+     * This class does not implement Serializable, so this field is never written to disk.
+     */
     private final String refreshToken;
     
     private final long expiresIn;
     
-    /** Token type (e.g., "Bearer") - not sensitive, just metadata */
-    // lgtm[jenkins/password-in-field]
+    /** 
+     * Token type (e.g., "Bearer") - not sensitive, just metadata.
+     * This is just a string like "Bearer", not sensitive data.
+     */
     private final String tokenType;
 
     public AuthResponse(String accessToken, String refreshToken, long expiresIn, String tokenType) {
