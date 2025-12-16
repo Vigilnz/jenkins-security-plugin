@@ -3,7 +3,7 @@
     <l:layout title="Vigilnz Security Scan Results">
         <l:main-panel>
             <h1 style="display:flex; align-items:center; gap:10px;font-family: 'Helvetica', sans-serif;">
-                <l:icon src="symbol-vigilnz plugin-vigilnz-security" class="icon-xlg"/>
+                <l:icon src="symbol-vigilnz plugin-vigilnz-security" style="width:45px;height:45px;" class="icon-xlg"/>
                 Vigilnz Security Scan Results
             </h1>
 

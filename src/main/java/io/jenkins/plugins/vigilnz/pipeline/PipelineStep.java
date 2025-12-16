@@ -13,17 +13,10 @@ import org.kohsuke.stapler.DataBoundSetter;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Pipeline step for Vigilnz security scans.
- * Security: The 'credentialsId' field stores only a credential ID (identifier), not the actual token value.
- * The actual token is stored securely in TokenCredentials using Secret.
- */
+
 public class PipelineStep extends Step {
 
-    /** 
-     * Credential ID (not sensitive - just an identifier to look up the actual credential).
-     * The actual token is stored securely in TokenCredentials using Secret.
-     */
+
     private final String credentialsId;
     private final List<String> scanTypes;
     private String targetFile;  // Optional parameter
@@ -34,17 +27,17 @@ public class PipelineStep extends Step {
         this.scanTypes = scanTypes != null ? scanTypes : List.of();
     }
 
-    @DataBoundSetter
-    public void setTargetFile(String targetFile) {
-        this.targetFile = targetFile;
-    }
-
     public String getCredentialsId() {
         return credentialsId;
     }
 
     public String getTargetFile() {
         return targetFile;
+    }
+
+    @DataBoundSetter
+    public void setTargetFile(String targetFile) {
+        this.targetFile = targetFile;
     }
 
     public List<String> getScanTypes() {

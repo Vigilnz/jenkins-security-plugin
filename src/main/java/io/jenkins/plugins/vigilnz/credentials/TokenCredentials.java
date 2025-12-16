@@ -14,13 +14,14 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-@SuppressWarnings("lgtm[jenkins/password-in-field]")
 public class TokenCredentials extends BaseStandardCredentials {
 
     private final Secret token;
 
+    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
     private final String tokenId;
 
+    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
     private final String tokenDescription;
 
     @DataBoundConstructor

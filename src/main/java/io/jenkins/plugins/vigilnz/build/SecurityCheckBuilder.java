@@ -12,10 +12,12 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import hudson.util.Secret;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.cli.shaded.org.apache.commons.lang.StringUtils;
 import io.jenkins.plugins.vigilnz.api.ApiService;
 import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
+import io.jenkins.plugins.vigilnz.models.ApiResponse;
 import io.jenkins.plugins.vigilnz.ui.ScanResultAction;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.AncestorInPath;
@@ -31,7 +33,6 @@ import java.util.List;
 // This file for Jenkins FreeStyle Job Method
 public class SecurityCheckBuilder extends Builder {
 
-    /** Credential ID (identifier to look up the actual credential, not sensitive) */
     private final String credentialsId;
     private String targetFile;  // Optional parameter
     private boolean cveScan;
@@ -104,12 +105,14 @@ public class SecurityCheckBuilder extends Builder {
         // Validate at least one scan type is selected
         if (scanTypes.isEmpty()) {
             listener.error("Error: At least one scan type must be selected.");
+            attachResult(build, buildErrorResponse("At least one scan type must be selected."));
             return false;
         }
 
         // Validate credentials ID is provided
         if (credentialsId == null || credentialsId.trim().isEmpty()) {
             listener.error("Error: Credentials ID is required. Please select a credential in the build step configuration.");
+            attachResult(build, buildErrorResponse("Credentials ID is required."));
             return false;
         }
 
@@ -122,6 +125,7 @@ public class SecurityCheckBuilder extends Builder {
 
         if (creds == null) {
             listener.error("Error: Vigilnz Token credential not found with ID: " + credentialsId);
+            attachResult(build, buildErrorResponse("Vigilnz Token credential not found with ID: " + credentialsId));
             return false;
         }
         // Get the actual token value from the credential
@@ -143,6 +147,8 @@ public class SecurityCheckBuilder extends Builder {
             build.addAction(new ScanResultAction(result));
         } catch (Exception e) {
             listener.error("Scan failed");
+            attachResult(build, buildErrorResponse("Scan failed: " + e.getMessage()));
+            build.addAction(new ScanResultAction(new ApiResponse().toString()));
             return false;
         }
 
@@ -223,4 +229,21 @@ public class SecurityCheckBuilder extends Builder {
 
     }
 
+    private void attachResult(AbstractBuild build, String json) {
+        try {
+            build.addAction(new ScanResultAction(json));
+        } catch (Exception ignored) {
+            // Swallow to avoid masking original error
+        }
+    }
+
+    private String buildErrorResponse(String message) {
+        ApiResponse resp = new ApiResponse();
+        resp.setMessage(message);
+        try {
+            return new ObjectMapper().writeValueAsString(resp);
+        } catch (JsonProcessingException e) {
+            return "{\"message\":\"" + message.replace("\"", "\\\"") + "\"}";
+        }
+    }
 }

@@ -6,8 +6,11 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.plugins.vigilnz.api.ApiService;
 import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
+import io.jenkins.plugins.vigilnz.models.ApiResponse;
 import io.jenkins.plugins.vigilnz.ui.ScanResultAction;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
@@ -76,16 +79,17 @@ public class PipelineStepExecution extends StepExecution {
 
         TaskListener listener = getContext().get(TaskListener.class);
         Run<?, ?> run = getContext().get(Run.class);
-        
+
         String credentialsId = step.getCredentialsId();
-        
+
         // Validate credentials ID is provided
         if (credentialsId == null || credentialsId.trim().isEmpty()) {
             listener.error("Error: Credentials ID is required. Please provide a credential ID in the pipeline step.");
+            attachResult(run, buildErrorResponse("Credentials ID is required."));
             getContext().onFailure(new AbortException("Credentials ID is required"));
             return false;
         }
-        
+
         TokenCredentials creds =
                 CredentialsProvider.findCredentialById(
                         credentialsId,
@@ -112,6 +116,7 @@ public class PipelineStepExecution extends StepExecution {
             // Validate at least one scan type is selected
             if (scanTypes == null || scanTypes.isEmpty()) {
                 listener.error("Error: At least one scan type must be selected.");
+                attachResult(run, buildErrorResponse("At least one scan type must be selected."));
                 getContext().onFailure(new AbortException("At least one scan type must be selected"));
                 return false;
             }
@@ -124,17 +129,37 @@ public class PipelineStepExecution extends StepExecution {
                 run.addAction(new ScanResultAction(result));
             } catch (Exception e) {
                 listener.error("Scan failed");
+                attachResult(run, buildErrorResponse("Scan failed: " + e.getMessage()));
                 getContext().onFailure(new AbortException("Scan failed"));
                 return false;
             }
 
         } else {
             listener.error("Error: Vigilnz Token credential not found with ID: " + credentialsId);
+            attachResult(run, buildErrorResponse("Vigilnz Token credential not found with ID: " + credentialsId));
             getContext().onFailure(new AbortException("No Vigilnz Token credential found with ID: " + credentialsId));
             return false;
         }
 
         getContext().onSuccess(null);
         return true;
+    }
+
+    private void attachResult(Run<?, ?> run, String json) {
+        try {
+            run.addAction(new ScanResultAction(json));
+        } catch (Exception ignored) {
+            // Swallow to avoid masking original error
+        }
+    }
+
+    private String buildErrorResponse(String message) {
+        ApiResponse resp = new ApiResponse();
+        resp.setMessage(message);
+        try {
+            return new ObjectMapper().writeValueAsString(resp);
+        } catch (JsonProcessingException e) {
+            return "{\"message\":\"" + message.replace("\"", "\\\"") + "\"}";
+        }
     }
 }
