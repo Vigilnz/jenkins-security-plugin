@@ -18,49 +18,26 @@ public class TokenCredentials extends BaseStandardCredentials {
 
     private final Secret token;
 
-    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
-    private final String tokenId;
-
-    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
-    private final String tokenDescription;
-
     @DataBoundConstructor
     public TokenCredentials(
             CredentialsScope scope,
-            String tokenId,
-            String tokenDescription,
+            String id,
+            String description,
             Secret token
     ) {
-        super(scope, tokenId, tokenDescription);
-        // If tokenId is null or empty, use empty string (Jenkins will handle ID generation)
-        // This prevents errors when updating credentials that were created without an ID
-        String idToUse = (tokenId == null || tokenId.trim().isEmpty()) ? "" : tokenId;
+        super(scope, id, description);
 
         if (token == null || Secret.toString(token).isEmpty()) {
             throw new IllegalArgumentException("Token is required");
         }
-        if (tokenId != null && tokenId.contains(" ")) {
-            throw new IllegalArgumentException("Token ID must not contain spaces");
-        }
+//        if (id != null && id.contains(" ")) {
+//            throw new IllegalArgumentException("Token ID must not contain spaces");
+//        }
         this.token = token;
-        this.tokenId = idToUse;
-        this.tokenDescription = tokenDescription;
     }
 
     public Secret getToken() {
         return token;
-    }
-
-    public String getTokenId() {
-        // If tokenId was never set by user, return the actual Jenkins-generated ID
-        if (tokenId == null || tokenId.trim().isEmpty()) {
-            return getId();
-        }
-        return tokenId;
-    }
-
-    public String getTokenDescription() {
-        return tokenDescription;
     }
 
 

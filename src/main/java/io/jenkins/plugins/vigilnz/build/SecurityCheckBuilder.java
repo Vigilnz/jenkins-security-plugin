@@ -178,7 +178,7 @@ public class SecurityCheckBuilder extends Builder {
                     project,
                     ACL.SYSTEM,  // Use actual user authentication, not ACL.SYSTEM
                     Collections.emptyList())) {
-                String label = c.getTokenId().isEmpty() ? c.getTokenDescription() : c.getTokenId();
+                String label = c.getId().isEmpty() ? c.getDescription() : c.getId();
                 if (label == null || label.isEmpty()) {
                     label = c.getId();
                 }
