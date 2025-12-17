@@ -59,24 +59,24 @@ public class TokenCredentials extends BaseStandardCredentials implements StringC
             return "Vigilnz Security Token";
         }
 
-        @POST
-        public FormValidation doCheckToken(@AncestorInPath Item item, @QueryParameter String token) {
+       // @POST
+      //  public FormValidation doCheckToken(@AncestorInPath Item item, @QueryParameter String token) {
             // Security: Check if user has permission to configure this item (project/folder)
             // If item is provided, check item permission; otherwise check global admin permission
-            if (item != null) {
-                if (!item.hasPermission(Item.CONFIGURE)) {
-                    return FormValidation.error("No permission to configure this item");
-                }
-            } else {
-                // Global credential creation/editing requires admin permission
-                Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-            }
+        //    if (item != null) {
+         //       if (!item.hasPermission(Item.CONFIGURE)) {
+        //            return FormValidation.error("No permission to configure this item");
+      //          }
+        //    } else {
+        //        // Global credential creation/editing requires admin permission
+       //         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+        //    }
 
-            if (token == null || token.trim().isEmpty()) {
-                return FormValidation.error("Field is required");
-            }
-            return FormValidation.ok();
-        }
+     //       if (token == null || token.trim().isEmpty()) {
+      //          return FormValidation.error("Field is required");
+    //        }
+   //         return FormValidation.ok();
+    //    }
 
         @POST
         public FormValidation doCheckTokenId(@AncestorInPath Item item, @QueryParameter String tokenId) {
