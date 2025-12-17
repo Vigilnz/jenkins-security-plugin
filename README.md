@@ -100,7 +100,7 @@ After a build completes:
 
 ```groovy
 vigilnzScan(
-    token: 'my-vigilnz-token',
+    credentialsId: 'my-vigilnz-token',
     scanTypes: 'cve'
 )
 ```
@@ -109,7 +109,7 @@ vigilnzScan(
 
 ```groovy
 vigilnzScan(
-    token: 'my-vigilnz-token',
+    credentialsId: 'my-vigilnz-token',
     scanTypes: 'cve,sast,sbom'
 )
 ```
@@ -125,7 +125,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'vigilnz-token', variable: 'VIGILNZ_TOKEN')]) {
                     vigilnzScan(
-                        token: 'vigilnz-token',
+                        credentialsId: 'vigilnz-token',
                         scanTypes: 'cve,sast'
                     )
                 }
