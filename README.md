@@ -8,11 +8,11 @@ Vigilnz Security Plugin integrates comprehensive security scanning capabilities 
 ## Features
 
 - 🔒 **Multiple Scan Types**: Support for CVE, SAST, SBOM, and more
-- 🔐 **Secure Credential Management**: Store and manage Vigilnz API tokens securely
+- 🔐 **Secure Credential Management**: Store and manage Vigilnz API credentials securely
 - 🚀 **Freestyle & Pipeline Support**: Works with both traditional and modern Jenkins jobs
 - 📊 **Detailed Results**: View scan results directly in the Jenkins build sidebar
 - ⚙️ **Flexible Configuration**: Select which scan types to run per build
-- 🔄 **Token Management**: Automatic token refresh and caching
+- 🔄 **Credential Management**: Automatic refresh and caching
 
 ## Requirements
 
@@ -53,7 +53,7 @@ Vigilnz Security Plugin integrates comprehensive security scanning capabilities 
 1. Create a new Freestyle project or edit an existing one
 2. In **Build Steps**, click **Add build step** → **Invoke Vigilnz Security Task**
 3. Configure:
-   - **Token**: Select your Vigilnz credential
+   - **Credentials**: Select your Vigilnz credential
    - **Target File**: (Optional) File or path to scan
    - **Scan Types**: Select at least one scan type (CVE, SAST, SBOM)
 4. Save and run the build
@@ -68,13 +68,14 @@ pipeline {
         stage('Security Scan') {
             steps {
                 vigilnzScan(
-                    token: 'my-vigilnz-token',
-                    scanTypes: ['cve', 'sast', 'sbom']
+                    credentialsId: 'my-vigilnz-creds',
+                    scanTypes: 'cve,sast,sbom'
                 )
             }
         }
     }
 }
+
 ```
 
 ## Configuration
@@ -100,7 +101,7 @@ After a build completes:
 ```groovy
 vigilnzScan(
     token: 'my-vigilnz-token',
-    scanTypes: ['cve']
+    scanTypes: 'cve'
 )
 ```
 
@@ -109,7 +110,7 @@ vigilnzScan(
 ```groovy
 vigilnzScan(
     token: 'my-vigilnz-token',
-    scanTypes: ['cve', 'sast', 'sbom']
+    scanTypes: 'cve,sast,sbom'
 )
 ```
 
@@ -125,7 +126,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'vigilnz-token', variable: 'VIGILNZ_TOKEN')]) {
                     vigilnzScan(
                         token: 'vigilnz-token',
-                        scanTypes: ['cve', 'sast']
+                        scanTypes: 'cve,sast'
                     )
                 }
             }
