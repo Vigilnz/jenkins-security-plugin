@@ -61,7 +61,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>5750.vec44cb_c78352</version>
+                <version>5774.v5c6d72f56a_61</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -74,6 +74,11 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>plain-credentials</artifactId>
         </dependency>
 
         <!-- Pipeline Step API -->

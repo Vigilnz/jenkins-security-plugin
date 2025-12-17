@@ -3,18 +3,20 @@ package io.jenkins.plugins.vigilnz.credentials;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-public class TokenCredentials extends BaseStandardCredentials {
+public class TokenCredentials extends BaseStandardCredentials implements StringCredentials {
 
     private final Secret token;
 
@@ -37,6 +39,12 @@ public class TokenCredentials extends BaseStandardCredentials {
     }
 
     public Secret getToken() {
+        return token;
+    }
+
+    @NonNull
+    @Override
+    public Secret getSecret() {
         return token;
     }
 

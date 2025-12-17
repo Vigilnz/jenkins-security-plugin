@@ -1,6 +1,8 @@
 package io.jenkins.plugins.vigilnz.build;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -12,8 +14,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.cli.shaded.org.apache.commons.lang.StringUtils;
 import io.jenkins.plugins.vigilnz.api.ApiService;
 import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
@@ -142,9 +142,14 @@ public class SecurityCheckBuilder extends Builder {
         String result = "";
 
         try {
+
             result = ApiService.triggerScan(tokenText, targetFile, scanTypes, env, listener);
             // Attach results to build
-            build.addAction(new ScanResultAction(result));
+            if (result != null && !result.isEmpty()) {
+                build.addAction(new ScanResultAction(result));
+            } else {
+                listener.getLogger().println("API call failed, no action added.");
+            }
         } catch (Exception e) {
             listener.error("Scan failed");
             attachResult(build, buildErrorResponse("Scan failed: " + e.getMessage()));
@@ -153,6 +158,24 @@ public class SecurityCheckBuilder extends Builder {
         }
 
         return true;
+    }
+
+    private void attachResult(AbstractBuild build, String json) {
+        try {
+            build.addAction(new ScanResultAction(json));
+        } catch (Exception ignored) {
+            // Swallow to avoid masking original error
+        }
+    }
+
+    private String buildErrorResponse(String message) {
+        ApiResponse resp = new ApiResponse();
+        resp.setMessage(message);
+        try {
+            return new ObjectMapper().writeValueAsString(resp);
+        } catch (JsonProcessingException e) {
+            return "{\"message\":\"" + message.replace("\"", "\\\"") + "\"}";
+        }
     }
 
     @Extension
@@ -227,23 +250,5 @@ public class SecurityCheckBuilder extends Builder {
             return FormValidation.ok();
         }
 
-    }
-
-    private void attachResult(AbstractBuild build, String json) {
-        try {
-            build.addAction(new ScanResultAction(json));
-        } catch (Exception ignored) {
-            // Swallow to avoid masking original error
-        }
-    }
-
-    private String buildErrorResponse(String message) {
-        ApiResponse resp = new ApiResponse();
-        resp.setMessage(message);
-        try {
-            return new ObjectMapper().writeValueAsString(resp);
-        } catch (JsonProcessingException e) {
-            return "{\"message\":\"" + message.replace("\"", "\\\"") + "\"}";
-        }
     }
 }

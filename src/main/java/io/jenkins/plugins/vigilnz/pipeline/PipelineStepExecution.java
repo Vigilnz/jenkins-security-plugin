@@ -1,13 +1,13 @@
 package io.jenkins.plugins.vigilnz.pipeline;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.plugins.vigilnz.api.ApiService;
 import io.jenkins.plugins.vigilnz.credentials.TokenCredentials;
 import io.jenkins.plugins.vigilnz.models.ApiResponse;
@@ -126,7 +126,11 @@ public class PipelineStepExecution extends StepExecution {
             String result;
             try {
                 result = ApiService.triggerScan(token, step.getTargetFile(), scanTypes, env, listener);
-                run.addAction(new ScanResultAction(result));
+                if (result != null && !result.isEmpty()) {
+                    run.addAction(new ScanResultAction(result));
+                } else {
+                    listener.getLogger().println("API call failed, no action added.");
+                }
             } catch (Exception e) {
                 listener.error("Scan failed");
                 attachResult(run, buildErrorResponse("Scan failed: " + e.getMessage()));

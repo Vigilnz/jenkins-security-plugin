@@ -10,6 +10,7 @@ import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -22,9 +23,15 @@ public class PipelineStep extends Step {
     private String targetFile;  // Optional parameter
 
     @DataBoundConstructor
-    public PipelineStep(String credentialsId, List<String> scanTypes) {
+    public PipelineStep(String credentialsId, String scanTypes) {
         this.credentialsId = credentialsId;
-        this.scanTypes = scanTypes != null ? scanTypes : List.of();
+
+        // Split comma-separated string into a list
+        if (scanTypes != null && !scanTypes.trim().isEmpty()) {
+            this.scanTypes = Arrays.asList(scanTypes.split("\\s*,\\s*"));
+        } else {
+            this.scanTypes = List.of();
+        }
     }
 
     public String getCredentialsId() {
